@@ -1,5 +1,5 @@
 
 module.exports = {
   'secret': 'AbhishekIsAwesome',
-  'database': 'mongodb://localhost/newTech'
+  'database': process.env.MONGODB_URI || 'mongodb://localhost/newTech'
 };
