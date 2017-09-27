@@ -33,9 +33,8 @@ app.use(express.static(__dirname + '/'));
 app.use(passport.initialize());
 
 // Start server
-var port = process.env.PORT || 8080
-  , ip = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-app.listen(port, ip, function () {
+var port = process.env.PORT || 8080;
+app.listen(port, function () {
   console.log('Express server listening on %d', port);
 });
 
