@@ -40,7 +40,7 @@ app.listen(port, ip, function () {
 });
 
 // connect to database
-mongoose.connect(config.database, { useMongoClient: true,  uri_decode_auth: true });
+mongoose.connect(config.database, { useMongoClient: true });
 var conn = mongoose.connection;
 var db = mongoose.connection.db;
 
