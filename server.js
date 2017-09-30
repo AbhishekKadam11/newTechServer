@@ -123,7 +123,7 @@ apiRoutes.post('/authenticate', function (req, res) {
   //       }
   //     });
   //   }
-  });
+ // });
 });
 
 // route to a restricted info (GET http://localhost:8080/api/memberinfo)
