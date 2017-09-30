@@ -437,6 +437,7 @@ apiRoutes.get('/productType', function (req, res) {
 
 apiRoutes.get('/users', function (req, res) {
     db.collection('users').find({}).toArray().then(function(doc) {
+        console.log('test');
         res.send(doc);
     }, function(error){
         console.log(error)
