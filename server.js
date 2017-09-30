@@ -435,3 +435,13 @@ apiRoutes.get('/productType', function (req, res) {
   })
 
 });
+
+apiRoutes.get('/users', function (req, res) {
+    db.collection('users').find(function (err, result) {
+        if (!err) {
+            return res.send(result);
+        } else {
+            return console.log(err);
+        }
+    });
+});
