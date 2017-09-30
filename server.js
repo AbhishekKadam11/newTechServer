@@ -105,6 +105,7 @@ apiRoutes.post('/authenticate', function (req, res) {
   }, function (err, user) {
     if (err) throw err;
 
+     console.log({error: err, res: user});
     if (!user) {
       res.send({success: false, msg: 'Authentication failed. User not found.', error: user});
     } else {
