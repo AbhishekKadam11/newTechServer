@@ -100,28 +100,29 @@ apiRoutes.post('/signup', function (req, res) {
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
 apiRoutes.post('/authenticate', function (req, res) {
-  User.findOne({
-    name: req.body.name
-  }, function (err, user) {
-    if (err) throw err;
-
-    if (!user) {
-      res.send({success: false, msg: 'Authentication failed. User not found.'});
-    } else {
-      // check if password matches
-      user.comparePassword(req.body.password, function (err, isMatch) {
-        if (isMatch && !err) {
-          // if user is found and password is right create a token
-          var token = jwt.encode(user._id, config.secret);
-          var name = user.name;
-          // return the information including token as JSON
-          res.json({success: true, token: token, profilename: user.profilename});
-          //     res.json({Name:user.name})
-        } else {
-          res.send({success: false, msg: 'Authentication failed. Wrong password.'});
-        }
-      });
-    }
+    res.send(req.body.name);
+  // User.findOne({
+  //   name: req.body.name
+  // }, function (err, user) {
+  //   if (err) throw err;
+  //
+  //   if (!user) {
+  //     res.send({success: false, msg: 'Authentication failed. User not found.'});
+  //   } else {
+  //     // check if password matches
+  //     user.comparePassword(req.body.password, function (err, isMatch) {
+  //       if (isMatch && !err) {
+  //         // if user is found and password is right create a token
+  //         var token = jwt.encode(user._id, config.secret);
+  //         var name = user.name;
+  //         // return the information including token as JSON
+  //         res.send({success: true, token: token, profilename: user.profilename});
+  //         //     res.json({Name:user.name})
+  //       } else {
+  //         res.send({success: false, msg: 'Authentication failed. Wrong password.'});
+  //       }
+  //     });
+  //   }
   });
 });
 
