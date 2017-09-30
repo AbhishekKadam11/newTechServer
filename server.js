@@ -39,16 +39,15 @@ app.listen(port, function () {
 });
 
 // connect to database
-var db = mongoose.createConnection(config.database, { useMongoClient: true },   function(err, db) {
-
-    if(db && !err) {
-        console.log("connected to mongodb" + " " + db);
-    }
-    else if(err) {
-        console.log("NOT connected to mongodb " + err + " " + db);
-    }
+// var db = mongoose.connect(config.database, { useMongoClient: true });
+// var conn = mongoose.connection;
+mongoose.connect(config.database, { useMongoClient: true });
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback () {
+    console.log("mongoose connected");
 });
-//var conn = mongoose.connection;
+
 
 //CORS middleware
 var allowCrossDomain = function (req, res, next) {
