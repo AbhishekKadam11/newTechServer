@@ -106,7 +106,7 @@ apiRoutes.post('/authenticate', function (req, res) {
     if (err) throw err;
 
     if (!user) {
-      res.send({success: false, msg: 'Authentication failed. User not found.'});
+      res.send({success: false, msg: 'Authentication failed. User not found.', error: user});
     } else {
       // check if password matches
       user.comparePassword(req.body.password, function (err, isMatch) {
