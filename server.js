@@ -39,9 +39,8 @@ app.listen(port, function () {
 });
 
 // connect to database
-mongoose.connect(config.database, { useMongoClient: true });
+var db = mongoose.connect(config.database, { useMongoClient: true });
 var conn = mongoose.connection;
-var db = mongoose.connection.db;
 
 //CORS middleware
 var allowCrossDomain = function (req, res, next) {
@@ -437,11 +436,9 @@ apiRoutes.get('/productType', function (req, res) {
 });
 
 apiRoutes.get('/users', function (req, res) {
-    db.collection('users').find(function (err, result) {
-        if (!err) {
-            return res.send(result);
-        } else {
-            return console.log(err);
-        }
-    });
+    db.collection('users').find({}).toArray().then(function(doc) {
+        res.send(doc);
+    }, function(error){
+        console.log(error)
+    })
 });
