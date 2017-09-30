@@ -22,7 +22,7 @@ var states = require('./app/models/states');
 
 
 // get our request parameters
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/'));
@@ -105,7 +105,7 @@ apiRoutes.post('/authenticate', function (req, res) {
   }, function (err, user) {
     if (err) throw err;
 
-     console.log(User);
+     console.log({error: err, res: user, data: req.body});
     if (!user) {
       res.send({success: false, msg: 'Authentication failed. User not found.', error: user});
     } else {
