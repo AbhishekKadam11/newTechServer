@@ -75,7 +75,7 @@ function ensureAuthorized(req, res, next) {
 }
 
 apiRoutes.get('/test', function(req, res){
-  console.log("testing live server");
+ res.send("testing live server");
 });
 
 // create a new user account (POST http://localhost:8080/api/signup)
