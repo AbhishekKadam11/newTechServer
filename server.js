@@ -20,9 +20,8 @@ var User = require('./app/models/user'); // get the mongoose model
 var Productupload = require('./app/models/productupload');
 var states = require('./app/models/states');
 
-
 // get our request parameters
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/'));
@@ -48,7 +47,6 @@ db.once('open', function callback () {
     console.log("mongoose connected");
 });
 
-
 //CORS middleware
 var allowCrossDomain = function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -67,7 +65,6 @@ var apiRoutes = express.Router();
 app.use('/api', apiRoutes);
 
 function ensureAuthorized(req, res, next) {
-//  var bearerToken;
   var bearerHeader = req.headers["authorization"];
   if (typeof bearerHeader !== 'undefined') {
     var bearer = bearerHeader.split(" ");
@@ -76,7 +73,7 @@ function ensureAuthorized(req, res, next) {
     req.userid = jwtverify.verify(bearerToken, config.secret);
     next();
   } else {
-    res.send(403);
+      res.status(401).send('Un-authorized user');
   }
 }
 
@@ -111,7 +108,6 @@ apiRoutes.post('/authenticate', function (req, res) {
   }, function (err, user) {
     if (err) throw err;
 
-     console.log({error: err, res: user, data: req.body});
     if (!user) {
       res.send({success: false, msg: 'Authentication failed. User not found.', error: user});
     } else {
@@ -241,7 +237,7 @@ apiRoutes.get('/productlist/:id', function (req, res) {
 
 function getFileById(req, res, next) {
   grid.mongo = mongoose.mongo;
-  var gfs = grid(conn.db);
+  var gfs = grid(db.db);
   //  var readstream = gfs.createReadStream({
   //    ID: req
   //  });
@@ -284,7 +280,7 @@ apiRoutes.post('/profiledata', ensureAuthorized, function (req, res) {
       if (oldpassword) {
         User.findOne({_id: req.userid}, function (err, user) {
           if (err) {
-            console.log('not found user');
+            console.log('user not found');
           } else {
             user.newPassword(oldpassword, function (err) {
               if (err) {
@@ -348,9 +344,9 @@ apiRoutes.post('/profiledata', ensureAuthorized, function (req, res) {
     var condition = {_id: req.userid};
     User.findOneAndUpdate(condition, profileData, {upsert: false, new: true}, function (err, doc) {
       if (err) {
-        return res.json({success: false, msg: 'Unable To save.'});
+        return res.send({success: false, msg: 'Unable To save.'});
       }
-      res.json({success: true, msg: 'Successful Updated.'});
+      res.send({success: true, msg: 'Successful Updated.'});
     });
   }
 });
@@ -442,10 +438,3 @@ apiRoutes.get('/productType', function (req, res) {
 
 });
 
-apiRoutes.get('/users', function (req, res) {
-    db.collection('users').find({}).toArray().then(function(doc) {
-        res.send(doc);
-    }, function(error){
-        console.log(error)
-    })
-});
