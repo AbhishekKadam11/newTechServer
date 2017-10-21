@@ -166,24 +166,28 @@ getToken = function (headers) {
 
 apiRoutes.post('/upload', function (req, res) {
   var form = new formidable.IncomingForm();
+  var imagedata;
   form.uploadDir = __dirname + '/uploads';
   form.keepExtensions = true;
   form.parse(req, function (err, fields, files) {
-    if (!err) {
-      console.log('Files Uploaded');
-      grid.mongo = mongoose.mongo;
-      var gfs = grid(conn.db);
-      // console.log(files);
-      var writestream = gfs.createWriteStream({
-        filename: files.file.name
-      });
-      fs.createReadStream(files.file.path).pipe(writestream);
-      writestream.on('close', function (file) {
-        //  callback(null, file);
-        var pid = (file._id.toString());
-        res.send(pid);
-      });
-    }
+      if (!err) {
+          console.log('Files Uploaded');
+          grid.mongo = mongoose.mongo;
+          var gfs = grid(db.db);
+          if (files['image']) {
+              imagedata = files['image'];
+              var writestream = gfs.createWriteStream({
+                  filename: imagedata['name']
+              });
+              fs.createReadStream(imagedata['path']).pipe(writestream);
+              writestream.on('close', function (file) {
+                  //  callback(null, file);
+                  var pid = (file._id.toString());
+                  console.log(pid);
+                  res.send(pid);
+              });
+          }
+      }
   });
 
 });
@@ -199,40 +203,6 @@ apiRoutes.get('getfile', function (req, res) {
   //fs_write_stream.on('close', function () {
   //  console.log('file has been written fully!');
   //});
-});
-
-
-apiRoutes.post('/product', function (req, res) {
-
-  var newProduct = new Productupload({
-    name: req.body.data.name,
-    category: req.body.data.category,
-    price: req.body.data.price,
-    arrivaldate: req.body.data.arrivaldate,
-    productimg: req.body.data.productimg
-  });
-
-  newProduct.save(function (err) {
-    if (err) {
-      console.log(err);
-      return res.json({success: false, msg: 'Error in inserting.'});
-    } else {
-      res.json({success: true, msg: 'Successful Inserted.'});
-    }
-  });
-});
-
-apiRoutes.get('/productlist/:id', function (req, res) {
-  return Productupload.findById(req.params.id, function (err, product) {
-    if (!err) {
-      imgid = product._doc.productimg;
-      getFileById(imgid);
-      return res.send(product);
-
-    } else {
-      return console.log(err);
-    }
-  });
 });
 
 function getFileById(req, res, next) {
@@ -429,12 +399,69 @@ apiRoutes.get('/userBasicDetails', ensureAuthorized, function (req, res) {
   };
 });
 
-apiRoutes.get('/productType', function (req, res) {
-  db.collection('product_type').find({}).toArray().then(function(doc) {
-    res.send(doc);
-  }, function(error){
-    console.log(error)
-  })
+apiRoutes.get('/productDropdownData', function (req, res) {
+  var data = {};
+    db.collection('category').find({}).toArray().then(function (cat) {
+        data['category'] = cat.map(item => ({
+                text: item.name,
+                id: item._id
+            }));
 
+    }, function (error) {
+        console.log(error)
+    });
+    db.collection('brands').find({}).toArray().then(function (brnd) {
+        data['brand'] = brnd.map(item => ({
+                text: item.name,
+                id: item._id
+            })
+        );
+        res.send(data);
+    }, function (error) {
+        console.log(error)
+    })
+
+});
+
+apiRoutes.post('/newproduct', function (req, res) {
+    var arrivaldate;
+    if (req.body.data.arrivaldate) {
+        arrivaldate = new Date(req.body.data.arrivaldate);
+    } else {
+        arrivaldate = new Date();
+    }
+
+    var newProduct = new Productupload({
+        title: req.body.data.title,
+        brand: req.body.data.brand,
+        category: req.body.data.category,
+        modalno: req.body.data.modalno,
+        price: req.body.data.price,
+        arrivaldate: arrivaldate,
+        productimgs: req.body.data.productimgs,
+        shortdescription: req.body.data.shortdescription,
+        fulldescription: req.body.data.fulldescription
+    });
+
+    newProduct.save(function (err) {
+        if (err) {
+            res.status(404).send({success: false, msg: err});
+        } else {
+            res.status(200).send({success: true, msg: 'Successful inserted.'});
+        }
+    });
+});
+
+apiRoutes.get('/productlist/:id', function (req, res) {
+    return Productupload.findById(req.params.id, function (err, product) {
+        if (!err) {
+            imgid = product._doc.productimg;
+            getFileById(imgid);
+            return res.send(product);
+
+        } else {
+            return console.log(err);
+        }
+    });
 });
 

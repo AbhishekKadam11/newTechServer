@@ -5,12 +5,19 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ProductSchema = new Schema({
-    name: {
+    title: {
         type: String,
-        unique: true,
+        required: true
+    },
+    brand: {
+        type: String,
         required: true
     },
     category: {
+        type: String,
+        required: true
+    },
+    modalno: {
         type: String,
         required: true
     },
@@ -19,10 +26,17 @@ var ProductSchema = new Schema({
         required: true
     },
     arrivaldate:{
-        type: Date
+        type: Date,
+        default: Date.now
     },
-    productimg: {
-        type: String
+    productimgs: {
+            type: Array
+    },
+    shortdescription: {
+        type: Array
+    },
+    fulldescription: {
+        type: Array
     }
 });
 
