@@ -12,7 +12,7 @@ var fs = require('fs');
 var grid = require('gridfs-stream');
 var formidable = require("formidable");
 var util = require('util');
-// var uuid = require('node-uuid');
+var async = require("async");
 var base64 = require('node-base64-image');
 
 var config = require('./config/database'); // get db config file
@@ -401,26 +401,35 @@ apiRoutes.get('/userBasicDetails', ensureAuthorized, function (req, res) {
 
 apiRoutes.get('/productDropdownData', function (req, res) {
   var data = {};
-    db.collection('category').find({}).toArray().then(function (cat) {
-        data['category'] = cat.map(item => ({
-                text: item.name,
-                id: item._id
-            }));
 
-    }, function (error) {
-        console.log(error)
-    });
-    db.collection('brands').find({}).toArray().then(function (brnd) {
-        data['brand'] = brnd.map(item => ({
-                text: item.name,
-                id: item._id
+    async.parallel({
+        category: function(callback) {
+            db.collection('category').find({}).toArray().then(function (cat) {
+                data['category'] = cat.map(item => ({
+                    text: item.name,
+                    id: item._id
+                }));
+                callback(null, data['category']);
+            }, function (error) {
+                console.log(error)
+            });
+        },
+        brand: function(callback) {
+            db.collection('brands').find({}).toArray().then(function (brnd) {
+                data['brand'] = brnd.map(item => ({
+                        text: item.name,
+                        id: item._id
+                    })
+                );
+                callback(null, data['brand']);
+                //    res.send(data);
+            }, function (error) {
+                console.log(error)
             })
-        );
-        res.send(data);
-    }, function (error) {
-        console.log(error)
-    })
-
+        }
+    }, function(err, results) {
+        res.send(results);
+    });
 });
 
 apiRoutes.post('/newproduct', function (req, res) {
