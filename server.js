@@ -169,6 +169,7 @@ apiRoutes.post('/upload', function (req, res) {
   var imagedata;
   form.uploadDir = __dirname + '/uploads';
   form.keepExtensions = true;
+  console.log(req);
   form.parse(req, function (err, fields, files) {
       if (!err) {
           console.log('Files Uploaded');
