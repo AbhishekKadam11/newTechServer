@@ -169,27 +169,27 @@ apiRoutes.post('/upload', function (req, res) {
   var imagedata;
   form.uploadDir = __dirname + '/uploads';
   form.keepExtensions = true;
-  console.log(req);
-  form.parse(req, function (err, fields, files) {
-      if (!err) {
-          console.log('Files Uploaded');
-          grid.mongo = mongoose.mongo;
-          var gfs = grid(db.db);
-          if (files['image']) {
-              imagedata = files['image'];
-              var writestream = gfs.createWriteStream({
-                  filename: imagedata['name']
-              });
-              fs.createReadStream(imagedata['path']).pipe(writestream);
-              writestream.on('close', function (file) {
-                  //  callback(null, file);
-                  var pid = (file._id.toString());
-                  console.log(pid);
-                  res.send(pid);
-              });
-          }
-      }
-  });
+    res.send("test");
+  // form.parse(req, function (err, fields, files) {
+  //     if (!err) {
+  //         console.log('Files Uploaded');
+  //         grid.mongo = mongoose.mongo;
+  //         var gfs = grid(db.db);
+  //         if (files['image']) {
+  //             imagedata = files['image'];
+  //             var writestream = gfs.createWriteStream({
+  //                 filename: imagedata['name']
+  //             });
+  //             fs.createReadStream(imagedata['path']).pipe(writestream);
+  //             writestream.on('close', function (file) {
+  //                 //  callback(null, file);
+  //                 var pid = (file._id.toString());
+  //                 console.log(pid);
+  //                 res.send(pid);
+  //             });
+  //         }
+  //     }
+  // });
 
 });
 
