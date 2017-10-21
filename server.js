@@ -170,7 +170,6 @@ apiRoutes.post('/upload', function (req, res) {
   form.uploadDir = __dirname + '/uploads';
   form.keepExtensions = true;
   form.parse(req, function (err, fields, files) {
-      console.log(files);
       if (!err) {
           console.log('Files Uploaded');
           grid.mongo = mongoose.mongo;
