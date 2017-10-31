@@ -12,8 +12,10 @@ var fs = require('fs');
 var grid = require('gridfs-stream');
 var formidable = require("formidable");
 var util = require('util');
-var async = require("async");
+//var async = require("async");
 var base64 = require('node-base64-image');
+var await = require('asyncawait/await');
+var async = require('asyncawait/async');
 
 var config = require('./config/database'); // get db config file
 var User = require('./app/models/user'); // get the mongoose model
@@ -189,7 +191,6 @@ apiRoutes.post('/upload', function (req, res) {
           }
       }
   });
-
 });
 
 apiRoutes.get('getfile', function (req, res) {
@@ -349,7 +350,7 @@ apiRoutes.get('/userBasicDetails', ensureAuthorized, function (req, res) {
     return new Promise(function (resolve, reject) {
       if (imageid) {
         grid.mongo = mongoose.mongo;
-        var gfs = grid(conn.db);
+        var gfs = grid(db.db);
         try {
           var data = [];
           var readstream = gfs.createReadStream({_id: imageid});
@@ -473,4 +474,189 @@ apiRoutes.get('/productlist/:id', function (req, res) {
         }
     });
 });
+
+// apiRoutes.get('/dashboardProductlist', function (req, res) {
+//     var product ={};
+//     let dashboardProductArray = [];
+//     let dashboardProduct = {};
+//     let motherboardArray = [], proceessorArray = [], graphicArray = [], monitorArray =[], routerArray = [];
+//     async.waterfall([
+//         function(callback){
+//             db.collection('productuploads').find({}).toArray().then(function (data) {
+//
+//                 data.forEach(function (value) {
+//                     if(value['category'] === 'Motherboard') {
+//                         product['data'] = value;
+//                         callback(null, value['image']);
+//                         motherboardArray.push(product);
+//                     }
+//                     else if(value['category'] === 'Processor') {
+//                         product['data'] = value;
+//                         callback(null, value['image']);
+//                         proceessorArray.push(product);
+//                     }
+//                     else if(value['category'] === 'Graphic Card') {
+//                         product['data'] = value;
+//                         callback(null, value['image']);
+//                         graphicArray.push(product);
+//                     }
+//                     else if(value['category'] === 'Monitor') {
+//                         product['data'] = value;
+//                         callback(null, value['image']);
+//                         monitorArray.push(product);
+//                     }
+//                     else if(value['category'] === 'Router') {
+//                         product['data'] = value;
+//                         callback(null, value['image']);
+//                         routerArray.push(product);
+//                     }
+//                 });
+//                 dashboardProduct['Motherboard'] = motherboardArray;
+//                 // dashboardProduct['Processor'] = proceessorArray;
+//                 // dashboardProduct['Graphic Card'] = graphicArray;
+//                 // dashboardProduct['Monitor'] = monitorArray;
+//                 // dashboardProduct['Router'] = routerArray;
+//             }, function (error) {
+//                 console.log(error)
+//             });
+//         },
+//         function(imageid, callback){
+//
+//                 if (imageid) {
+//                     grid.mongo = mongoose.mongo;
+//                     var gfs = grid(db.db);
+//                     try {
+//                         var data = [];
+//                         var readstream = gfs.createReadStream({_id: imageid});
+//                         readstream.on('data', function (chunk) {
+//                             data.push(chunk);
+//                         });
+//                         readstream.on('end', function () {
+//                             data = Buffer.concat(data);
+//                             var img = 'data:image/jpeg;base64,' + Buffer(data).toString('base64');
+//                             // product['image'] = img;
+//                           //  resolve(img);
+//                             product['image'] = img;
+//                             callback(null, product);
+//                             // res.end(img);
+//                         });
+//
+//                         readstream.on('error', function (err) {
+//                             console.log('An error occurred!', err);
+//                             throw err;
+//                         });
+//                     }
+//                     catch (err) {
+//                         console.log(err);
+//                         return next(errors.create(404, "File not found."));
+//                     }
+//                 } else {
+//                     reject('No Image');
+//                 }
+//
+//
+//         },
+//
+//     ], function (err, result) {
+//         res.send(dashboardProduct);
+//         // result now equals 'done'
+//     });
+//
+// });
+
+
+apiRoutes.get('/dashboardProductlist', function (req, res) {
+
+    db.collection('productuploads').find({}).toArray().then(function (data) {
+        productExtration(data).then(function (result) {
+            return res.json(result);
+        }, function (err) {
+            return res.json('Unable to fetch data');
+        });
+    }, function (error) {
+        res.json('Unable to fetch data');
+    });
+});
+
+function productExtration(data) {
+
+    let dashboardProduct = {};
+    let motherboardArray = [], proceessorArray = [], graphicArray = [], monitorArray =[], routerArray = [];
+    return new Promise((resolve, reject) => {
+        var productData = async(function () {
+            data.forEach(function (value) {
+                var product = {};
+                if (value['category'] === 'Motherboard') {
+                    product['data'] = value;
+                    product['image'] = await(getImage(value['image']));
+                    motherboardArray.push(product);
+                }
+                if (value['category'] === 'Processor') {
+                    product['data'] = value;
+                    product['image'] = await(getImage(value['image']));
+                    proceessorArray.push(product);
+                }
+                if (value['category'] === 'Graphic Card') {
+                    product['data'] = value;
+                    product['image'] = await(getImage(value['image']));
+                    graphicArray.push(product);
+                }
+                if (value['category'] === 'Monitor') {
+                    product['data'] = value;
+                    product['image'] = await(getImage(value['image']));
+                    monitorArray.push(product);
+                }
+                if (value['category'] === 'Router') {
+                    product['data'] = value;
+                    product['image'] = await(getImage(value['image']));
+                    routerArray.push(product);
+                }
+            });
+            dashboardProduct['motherboard'] = motherboardArray;
+            dashboardProduct['processor'] = proceessorArray;
+            dashboardProduct['graphiccard'] = graphicArray;
+            dashboardProduct['monitor'] = monitorArray;
+            dashboardProduct['router'] = routerArray;
+            resolve(dashboardProduct);
+            //    console.log(dashboardProduct);
+        });
+        productData();
+    });
+} //<--function end
+
+function getImage(imageid) {
+    return new Promise(function (resolve, reject) {
+        if (imageid) {
+            grid.mongo = mongoose.mongo;
+            var gfs = grid(db.db);
+            try {
+                var data = [];
+                var readstream = gfs.createReadStream({_id: imageid});
+                readstream.on('data', function (chunk) {
+                    data.push(chunk);
+                });
+
+                readstream.on('end', function () {
+                    data = Buffer.concat(data);
+                    var img = 'data:image/jpeg;base64,' + Buffer(data).toString('base64');
+                 //   userdata['image'] = img;
+                    resolve (img);
+                    // res.end(img);
+                });
+
+                readstream.on('error', function (err) {
+                    console.log('An error occurred!', err);
+                  //  throw err;
+                    resolve (null);
+                });
+            }
+            catch (err) {
+                console.log(err);
+                return next(errors.create(404, "File not found."));
+            }
+        } else {
+          //  reject('No Image');
+        }
+    })
+}
 
