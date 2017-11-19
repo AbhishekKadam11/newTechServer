@@ -21,16 +21,19 @@ var ProductSchema = new Schema({
         type: String,
         required: true
     },
-    price:{
+    price: {
         type: Number,
         required: true
     },
-    arrivaldate:{
+    arrivaldate: {
         type: Date,
         default: Date.now
     },
-    productimgs: {
-            type: Array
+    productimages: {
+        type: Array
+    },
+    image: {
+        type: String
     },
     shortdescription: {
         type: Array
