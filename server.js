@@ -23,7 +23,7 @@ var Productupload = require('./app/models/productupload');
 var states = require('./app/models/states');
 
 // get our request parameters
-//app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/'));
@@ -463,18 +463,18 @@ apiRoutes.post('/newproduct', function (req, res) {
     });
 });
 
-apiRoutes.get('/productlist/:id', function (req, res) {
-    return Productupload.findById(req.params.id, function (err, product) {
-        if (!err) {
-            imgid = product._doc.productimg;
-            getFileById(imgid);
-            return res.send(product);
-
-        } else {
-            return console.log(err);
-        }
-    });
-});
+// apiRoutes.get('/productlist/:id', function (req, res) {
+//     return Productupload.findById(req.params.id, function (err, product) {
+//         if (!err) {
+//             imgid = product._doc.productimg;
+//             getFileById(imgid);
+//             return res.send(product);
+//
+//         } else {
+//             return console.log(err);
+//         }
+//     });
+// });
 
 apiRoutes.get('/dashboardProductlist', function (req, res) {
 
@@ -523,11 +523,21 @@ function productExtration(data) {
                     routerArray.push(product);
                 }
             });
-            dashboardProduct['motherboard'] = motherboardArray;
-            dashboardProduct['processor'] = proceessorArray;
-            dashboardProduct['graphiccard'] = graphicArray;
-            dashboardProduct['monitor'] = monitorArray;
-            dashboardProduct['router'] = routerArray;
+            if(motherboardArray.length !== 0){
+                dashboardProduct['motherboard'] = motherboardArray
+            }
+            if(proceessorArray.length !== 0){
+                dashboardProduct['processor'] = proceessorArray
+            }
+            if(graphicArray.length !== 0){
+                dashboardProduct['graphiccard'] = graphicArray
+            }
+            if(monitorArray.length !== 0){
+                dashboardProduct['monitor'] = monitorArray
+            }
+            if(routerArray.length !== 0){
+                dashboardProduct['router'] = routerArray
+            }
             resolve(dashboardProduct);
             //    console.log(dashboardProduct);
         });
@@ -607,3 +617,16 @@ function productImageExtration(data) {
         productData();
     })
 }
+
+apiRoutes.get('/productList/:ptype', function (req, res) {
+    let product_type = req.params.ptype;
+    db.collection('productuploads').find({category: product_type}).toArray().then(function (data) {
+        productExtration(data).then(function (result) {
+            return res.json(result);
+        }, function (err) {
+            return res.json('Unable to fetch data');
+        });
+    }, function (error) {
+        res.json('Unable to fetch data');
+    });
+});
