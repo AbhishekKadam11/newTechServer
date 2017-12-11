@@ -630,3 +630,18 @@ apiRoutes.get('/productList/:ptype', function (req, res) {
         res.json('Unable to fetch data');
     });
 });
+
+apiRoutes.get('/filteredProducts/:ptype/:brandChoice', function (req, res) {
+    let product_type = req.params.ptype;
+    let brandChoice = req.params.brandChoice;
+    console.log(brandChoice);
+    db.collection('productuploads').find({category: product_type, brand:  { $in: brandChoice.split(',') }}).toArray().then(function (data) {
+        productExtration(data).then(function (result) {
+            return res.json(result);
+        }, function (err) {
+            return res.json('Unable to fetch data');
+        });
+    }, function (error) {
+        res.json('Unable to fetch data');
+    });
+});
