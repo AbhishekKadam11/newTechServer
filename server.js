@@ -618,28 +618,14 @@ function productImageExtration(data) {
     })
 }
 
-// apiRoutes.get('/productList/:ptype', function (req, res) {
-//     let product_type = req.params.ptype;
-//     db.collection('productuploads').find({category: product_type}).toArray().then(function (data) {
-//         productExtration(data).then(function (result) {
-//             return res.json(result);
-//         }, function (err) {
-//             return res.json('Unable to fetch data');
-//         });
-//     }, function (error) {
-//         res.json('Unable to fetch data');
-//     });
-// });
+apiRoutes.get('/productList', function (req, res) {
 
-apiRoutes.get('/productList/:ptype/:brandChoice', function (req, res) {
-    let product_type = req.params.ptype;
-    let brandChoice = req.params.brandChoice;
     let productSearch = {};
-    if( req.params.ptype !== 'undefined') {
-        productSearch.category = req.params.ptype;
+    if (req.query.ptype) {
+        productSearch.category = req.query.ptype;
     }
-    if( (req.params.brandChoice) !== 'undefined' && req.params.brandChoice.length !==0) {
-        productSearch.brand = { $in:  req.params.brandChoice.split(',') };
+    if (req.query.selectedChoices) {
+        productSearch.brand = {$in: req.query.selectedChoices.split(',')};
     }
 
     db.collection('productuploads').find(productSearch).toArray().then(function (data) {
