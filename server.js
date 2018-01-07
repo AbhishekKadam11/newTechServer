@@ -16,11 +16,13 @@ var async = require("async");
 var base64 = require('node-base64-image');
 var await = require('asyncawait/await');
 var asyncawait = require('asyncawait/async');
+var shortid = require('shortid');
 
 var config = require('./config/database'); // get db config file
 var User = require('./app/models/user'); // get the mongoose model
 var Productupload = require('./app/models/productupload');
 var states = require('./app/models/states');
+var OrderRequest = require('./app/models/placeorder');
 
 // get our request parameters
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -463,23 +465,10 @@ apiRoutes.post('/newproduct', function (req, res) {
     });
 });
 
-// apiRoutes.get('/productlist/:id', function (req, res) {
-//     return Productupload.findById(req.params.id, function (err, product) {
-//         if (!err) {
-//             imgid = product._doc.productimg;
-//             getFileById(imgid);
-//             return res.send(product);
-//
-//         } else {
-//             return console.log(err);
-//         }
-//     });
-// });
-
 apiRoutes.get('/dashboardProductlist', function (req, res) {
 
     db.collection('productuploads').find({}).toArray().then(function (data) {
-        productExtration(data).then(function (result) {
+        productExtraction(data).then(function (result) {
             return res.json(result);
         }, function (err) {
             return res.json('Unable to fetch data');
@@ -489,7 +478,7 @@ apiRoutes.get('/dashboardProductlist', function (req, res) {
     });
 });
 
-function productExtration(data) {
+function productExtraction(data) {
 
     let dashboardProduct = {};
     let motherboardArray = [], proceessorArray = [], graphicArray = [], monitorArray =[], routerArray = [];
@@ -584,7 +573,7 @@ function getImage(imageid) {
 apiRoutes.get('/productDescriptionData/:pid', function (req, res) {
     let product_id = new ObjectId(req.params.pid);
     db.collection('productuploads').find({_id: product_id}).toArray().then(function (data) {
-        productImageExtration(data).then(function (result) {
+        productImageExtraction(data).then(function (result) {
             return res.json(result);
         }, function (err) {
             return res.json('Unable to fetch data');
@@ -595,8 +584,7 @@ apiRoutes.get('/productDescriptionData/:pid', function (req, res) {
     });
 });
 
-function productImageExtration(data) {
-
+function productImageExtraction(data) {
     let product = {};
     let imgarray = [];
     let productimages = [];
@@ -619,7 +607,6 @@ function productImageExtration(data) {
 }
 
 apiRoutes.get('/productList', function (req, res) {
-
     let productSearch = {};
     if (req.query.ptype) {
         productSearch.category = req.query.ptype;
@@ -638,3 +625,36 @@ apiRoutes.get('/productList', function (req, res) {
         res.json('Unable to fetch data');
     });
 });
+
+apiRoutes.post('/placeOrder', ensureAuthorized,  function (req, res) {
+    let customerId = new ObjectId(req.userid);
+    var arrivalDate = new Date();
+    arrivalDate.setDate(arrivalDate.getDate() + 10);
+
+//    var rev = reverseString(str);
+  //  console.log(shortid.generate());
+
+    let newOrder = new OrderRequest({
+        customerId: customerId,
+        orderData: req.body.data.orderData,
+        orderId: shortid.generate(),
+        totalamount: req.body.data.totalamount,
+        arrivaldate: arrivalDate
+    });
+
+    newOrder.save(function (err) {
+        if (err) {
+            res.status(404).send({success: false, msg: err});
+        } else {
+            res.status(200).send({success: true, msg: 'Order placed successfully.'});
+        }
+   });
+});
+
+function reverseString(str) {
+    var newString = "";
+    for (var i = str.length - 1; i >= 0; i--) {
+        newString += str[i];
+    }
+    return newString;
+    }
