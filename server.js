@@ -17,6 +17,7 @@ var base64 = require('node-base64-image');
 var await = require('asyncawait/await');
 var asyncawait = require('asyncawait/async');
 var shortid = require('shortid');
+var base64Img = require('base64-img');
 
 var config = require('./config/database'); // get db config file
 var User = require('./app/models/user'); // get the mongoose model
@@ -168,31 +169,74 @@ getToken = function (headers) {
 
 //---------image upload-----------
 
+// apiRoutes.post('/upload', function (req, res) {
+//   var form = new formidable.IncomingForm();
+//   var imagedata;
+//   form.uploadDir = __dirname + '/uploads';
+//   form.keepExtensions = true;
+//   form.hash = true;
+//     // form.on('file', function(field, file) {
+//     //     //rename the incoming file to the file's name
+//     //     fs.rename(file.path, form.uploadDir + "/" + file.name);
+//     // });
+//     // form.on('fileBegin', function(name, file) {
+//     //     console.log(file);
+//     // });
+//     form.on('fileBegin', function(field, file) {
+//         //rename the incoming file to the file's name
+//         file.path = form.uploadDir + "/" + file.name;
+//     });
+//   form.parse(req, function (err, fields, files) {
+//       if (!err) {
+//           console.log('Files Uploaded');
+//           grid.mongo = mongoose.mongo;
+//           var gfs = grid(db.db);
+//           if (files['image']) {
+//               imagedata = files['image'];
+//             //  console.log(files);
+//               var writestream = gfs.createWriteStream({
+//                   filename: imagedata['name']
+//               });
+//
+//              // fs.rename(file.path, form.uploadDir + "/" + file.name);
+//               fs.createReadStream(imagedata['path']).pipe(writestream);
+//               writestream.on('close', function (file) {
+//                   //  callback(null, file);
+//                   var pid = (file._id.toString());
+//               //    console.log(file);
+//                   res.send(pid);
+//               });
+//           }
+//       }
+//   });
+//
+// });
+
 apiRoutes.post('/upload', function (req, res) {
-  var form = new formidable.IncomingForm();
-  var imagedata;
-  form.uploadDir = __dirname + '/uploads';
-  form.keepExtensions = true;
-  form.parse(req, function (err, fields, files) {
-      if (!err) {
-          console.log('Files Uploaded');
-          grid.mongo = mongoose.mongo;
-          var gfs = grid(db.db);
-          if (files['image']) {
-              imagedata = files['image'];
-              var writestream = gfs.createWriteStream({
-                  filename: imagedata['name']
-              });
-              fs.createReadStream(imagedata['path']).pipe(writestream);
-              writestream.on('close', function (file) {
-                  //  callback(null, file);
-                  var pid = (file._id.toString());
-                  console.log(pid);
-                  res.send(pid);
-              });
-          }
-      }
-  });
+    var form = new formidable.IncomingForm();
+    var imagedata;
+    form.uploadDir = __dirname + '/uploads';
+    form.keepExtensions = true;
+    form.parse(req, function (err, fields, files) {
+        if (!err) {
+            console.log('Files Uploaded');
+            grid.mongo = mongoose.mongo;
+            var gfs = grid(db.db);
+            if (files['image']) {
+                imagedata = files['image'];
+                var writestream = gfs.createWriteStream({
+                    filename: imagedata['name']
+                });
+                fs.createReadStream(imagedata['path']).pipe(writestream);
+                writestream.on('close', function (file) {
+                    //  callback(null, file);
+                    var pid = (file._id.toString());
+                    console.log(pid);
+                    res.send(pid);
+                });
+            }
+        }
+    });
 });
 
 apiRoutes.get('getfile', function (req, res) {
@@ -549,6 +593,8 @@ function getImage(imageid) {
                 readstream.on('end', function () {
                     data = Buffer.concat(data);
                     var img = 'data:image/jpeg;base64,' + Buffer(data).toString('base64');
+                    // var filepath = base64Img.imgSync(img, '', '2');
+                    // console.log(filepath);
                  //   userdata['image'] = img;
                     resolve (img);
                     // res.end(img);
@@ -568,6 +614,16 @@ function getImage(imageid) {
           //  reject('No Image');
         }
     })
+    // return new Promise(function (resolve, reject) {
+    //     let image_id = new ObjectId(imageid);
+    //     grid.mongo = mongoose.mongo;
+    //     var gfs = grid(db.db);
+    //     gfs.files.findOne({_id: image_id} , function (err, files) {
+    //
+    //         console.log(files['filename']);
+    //     })
+    //    // resolve (img);
+    // })
 }
 
 apiRoutes.get('/productDescriptionData/:pid', function (req, res) {
@@ -616,7 +672,7 @@ apiRoutes.get('/productList', function (req, res) {
     }
 
     db.collection('productuploads').find(productSearch).toArray().then(function (data) {
-        productExtration(data).then(function (result) {
+        productExtraction(data).then(function (result) {
             return res.json(result);
         }, function (err) {
             return res.json('Unable to fetch data');
@@ -657,4 +713,26 @@ function reverseString(str) {
         newString += str[i];
     }
     return newString;
+}
+
+apiRoutes.get('/searchItem', function (req, res) {
+    let searchKey;
+    if (req.query.searchKey) {
+        searchKey = req.query.searchKey;
     }
+    db.collection('productuploads').find({   "$or": [{
+            "title": {'$regex' : '.*' + searchKey + '.*', '$options' : 'im'}
+        }, {
+            "brand": { '$regex' : searchKey, '$options' : 'i' }
+        }]}).toArray().then(function (data) {
+        data.forEach(function (item) {
+            delete item['fulldescription'];
+            delete item['shortdescription'];
+            delete item['productimages'];
+        });
+        return res.json(data);
+    }, function (error) {
+        res.json('Unable to fetch data');
+    });
+
+});
