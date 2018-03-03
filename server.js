@@ -61,6 +61,12 @@ var allowCrossDomain = function (req, res, next) {
 };
 app.use(allowCrossDomain);
 
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     next();
+// });
+
 // pass passport for configuration
 require('./config/passport')(passport);
 
@@ -227,12 +233,15 @@ apiRoutes.post('/upload', function (req, res) {
                 var writestream = gfs.createWriteStream({
                     filename: imagedata['name']
                 });
-                fs.createReadStream(imagedata['path']).pipe(writestream);
+                var filename = imagedata['path'].substr(44);
+              //  imagedata['path'] =  __dirname+ "/uploads/" + filename;
+            //  console.log(imagedata['path']);
+               var result = fs.createReadStream(imagedata['path']).pipe(writestream);
+
                 writestream.on('close', function (file) {
-                    //  callback(null, file);
-                    var pid = (file._id.toString());
-                    console.log(pid);
-                    res.send(pid);
+                 //   var pid = (file._id.toString());
+                 //   console.log(pid);
+                    res.send(filename);
                 });
             }
         }
@@ -532,27 +541,27 @@ function productExtraction(data) {
                 var product = {};
                 if (value['category'] === 'Motherboard') {
                     product['data'] = value;
-                    product['image'] = await(getImage(value['image']));
+                    product['image'] =  value['image'];
                     motherboardArray.push(product);
                 }
                 if (value['category'] === 'Processor') {
                     product['data'] = value;
-                    product['image'] = await(getImage(value['image']));
+                    product['image'] = value['image'];
                     proceessorArray.push(product);
                 }
                 if (value['category'] === 'Graphic Card') {
                     product['data'] = value;
-                    product['image'] = await(getImage(value['image']));
+                    product['image'] = value['image'];
                     graphicArray.push(product);
                 }
                 if (value['category'] === 'Monitor') {
                     product['data'] = value;
-                    product['image'] = await(getImage(value['image']));
+                    product['image'] = value['image'];
                     monitorArray.push(product);
                 }
                 if (value['category'] === 'Router') {
                     product['data'] = value;
-                    product['image'] = await(getImage(value['image']));
+                    product['image'] = value['image'];
                     routerArray.push(product);
                 }
             });
@@ -646,12 +655,12 @@ function productImageExtraction(data) {
     let productimages = [];
     return new Promise((resolve, reject) => {
         var productData = asyncawait(function () {
-            product['image'] = await(getImage(data[0]['image']));
+            product['image'] = data[0]['image'];
             product['data'] = data[0];
             imgarray = data[0]['productimages'];
             imgarray.forEach(function (value) {
                     var productimg;
-                    productimg = await(getImage(value));
+                    productimg = value;
                     productimages.push(productimg);
                 }
             );
@@ -725,12 +734,17 @@ apiRoutes.get('/searchItem', function (req, res) {
         }, {
             "brand": { '$regex' : searchKey, '$options' : 'i' }
         }]}).toArray().then(function (data) {
-        data.forEach(function (item) {
-            delete item['fulldescription'];
-            delete item['shortdescription'];
-            delete item['productimages'];
+        productExtraction(data).then(function (result) {
+            return res.json(result);
+        }, function (err) {
+            return res.json('Unable to fetch data');
         });
-        return res.json(data);
+        // data.forEach(function (item) {
+        //     delete item['fulldescription'];
+        //     delete item['shortdescription'];
+        //     delete item['productimages'];
+        // });
+        // return res.json(data);
     }, function (error) {
         res.json('Unable to fetch data');
     });
