@@ -734,17 +734,11 @@ apiRoutes.get('/searchItem', function (req, res) {
         }, {
             "brand": { '$regex' : searchKey, '$options' : 'i' }
         }]}).toArray().then(function (data) {
-        productExtraction(data).then(function (result) {
-            return res.json(result);
-        }, function (err) {
-            return res.json('Unable to fetch data');
-        });
-        // data.forEach(function (item) {
-        //     delete item['fulldescription'];
-        //     delete item['shortdescription'];
-        //     delete item['productimages'];
-        // });
-        // return res.json(data);
+            if(data.length !== 0) {
+                return res.status(200).send(data);
+            } else {
+                return res.status(404).send("No item found with this keywords");
+            }
     }, function (error) {
         res.json('Unable to fetch data');
     });
