@@ -725,15 +725,25 @@ function reverseString(str) {
 }
 
 apiRoutes.get('/searchItem', function (req, res) {
-    let searchKey;
+    let searchKey, selectedCategories, quartParams;
     if (req.query.searchKey) {
         searchKey = req.query.searchKey;
+        quartParams = { $or: [{"title": {'$regex' : '.*' + searchKey + '.*', '$options' : 'im'}},
+            {"brand": { '$regex' : searchKey, '$options' : 'i' }}] }
     }
-    db.collection('productuploads').find({   "$or": [{
-            "title": {'$regex' : '.*' + searchKey + '.*', '$options' : 'im'}
-        }, {
-            "brand": { '$regex' : searchKey, '$options' : 'i' }
-        }]}).toArray().then(function (data) {
+
+    if (req.query.categories && req.query.categories !== 'undefined') {
+        selectedCategories = {$in: req.query.categories.split(',')};
+        quartParams =     { $or: [{"title": {'$regex' : '.*' + searchKey + '.*', '$options' : 'im'}},
+                {"brand": { '$regex' : searchKey, '$options' : 'i' }}] ,
+             $and: [{"category": selectedCategories }] }
+    }
+
+    db.collection('productuploads').find({
+        $and: [
+            quartParams
+        ]
+    }).toArray().then(function (data) {
             if(data.length !== 0) {
                 return res.status(200).send(data);
             } else {
