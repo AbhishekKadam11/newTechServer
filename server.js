@@ -1,4 +1,4 @@
-ustomer comment based on product api is addedvar express = require('express');
+var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
@@ -851,7 +851,6 @@ apiRoutes.get('/productReview', function (req, res) {
         })
         productData();
        }
-
     }, function (error) {
         res.status(404).json('Unable to fetch data');
     });
