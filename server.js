@@ -839,9 +839,9 @@ apiRoutes.get('/productReview', function (req, res) {
                 userbasicData(obj['customerId'])
                     .then(function (userData) {
                         obj['name'] = userData['firstname'] + ' ' + userData['lastname'];
-                        delete obj['__v']
+                        delete obj['__v'];
                         customerReview.push(obj);
-                        if (customerReview.length === review.length) {
+                        if (customerReview.length === data.length) {
                             res.status(200).json(customerReview);
                         }
                     }, function (error) {
