@@ -96,7 +96,7 @@ apiRoutes.get('/test', function (req, res) {
 // create a new user account (POST http://localhost:8080/api/signup)
 apiRoutes.post('/signup', function (req, res) {
     if (!req.body.data.name || !req.body.data.passwords.password) {
-        res.json({ success: false, msg: 'Please enter name and password.' });
+        res.json({success: false, msg: 'Please enter name and password.'});
     } else {
         var newUser = new User({
             profilename: req.body.data.name,
@@ -106,9 +106,9 @@ apiRoutes.post('/signup', function (req, res) {
         // save the user
         newUser.save(function (err) {
             if (err) {
-                return res.json({ success: false, msg: 'Username already exists.' });
+                return res.json({success: false, msg: 'Username already exists.'});
             }
-            res.json({ success: true, msg: 'Successful created new user.' });
+            res.json({success: true, msg: 'Successful created new user.'});
         });
     }
 });
