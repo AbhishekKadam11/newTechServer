@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5f0d7336-e1f8-4412-a72c-a0cc2f0e57d3" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/server.js" afterPath="$PROJECT_DIR$/server.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -384,7 +383,7 @@
       <workItem from="1522334724074" duration="128000" />
       <workItem from="1522597709004" duration="1959000" />
       <workItem from="1522768682470" duration="85000" />
-      <workItem from="1522943243302" duration="226000" />
+      <workItem from="1522943243302" duration="276000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1506506890703</created>
@@ -708,11 +707,18 @@
       <option name="project" value="LOCAL" />
       <updated>1520432351685</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="-Modify sign up api bug.">
+      <created>1522943507638</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1522943507638</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="230031000" />
+    <option name="totallyTimeSpent" value="230081000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -755,7 +761,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="first commit" />
     <MESSAGE value="changes for mongodb atlas setup" />
     <MESSAGE value="make test rote to check live server." />
     <MESSAGE value="Changes in database connection." />
@@ -780,7 +785,8 @@
     <MESSAGE value="-fix uploaded image path." />
     <MESSAGE value="-Added search item api." />
     <MESSAGE value="-Modified search item api based on categories." />
-    <option name="LAST_COMMIT_MESSAGE" value="-Modified search item api based on categories." />
+    <MESSAGE value="-Modify sign up api bug." />
+    <option name="LAST_COMMIT_MESSAGE" value="-Modify sign up api bug." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
