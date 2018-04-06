@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5f0d7336-e1f8-4412-a72c-a0cc2f0e57d3" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/models/user.js" afterPath="$PROJECT_DIR$/app/models/user.js" />
-      <change beforePath="$PROJECT_DIR$/server.js" afterPath="$PROJECT_DIR$/server.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -24,8 +22,8 @@
       <file leaf-file-name="server.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+            <state relative-caret-position="712">
+              <caret line="144" column="96" lean-forward="true" selection-start-line="144" selection-start-column="96" selection-end-line="144" selection-end-column="96" />
               <folding />
             </state>
           </provider>
@@ -387,7 +385,7 @@
       <workItem from="1522597709004" duration="1959000" />
       <workItem from="1522768682470" duration="85000" />
       <workItem from="1522943243302" duration="2379000" />
-      <workItem from="1523028687393" duration="3372000" />
+      <workItem from="1523028687393" duration="3720000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1506506890703</created>
@@ -725,11 +723,18 @@
       <option name="project" value="LOCAL" />
       <updated>1522943526101</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="-set token after registration.">
+      <created>1523034151246</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1523034151246</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="235556000" />
+    <option name="totallyTimeSpent" value="235904000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -772,7 +777,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="make test rote to check live server." />
     <MESSAGE value="Changes in database connection." />
     <MESSAGE value="Changes in mongooes connection." />
     <MESSAGE value="Changes in express connection." />
@@ -797,7 +801,8 @@
     <MESSAGE value="-Modified search item api based on categories." />
     <MESSAGE value="-Modify sign up api bug." />
     <MESSAGE value="-Modify sign up api." />
-    <option name="LAST_COMMIT_MESSAGE" value="-Modify sign up api." />
+    <MESSAGE value="-set token after registration." />
+    <option name="LAST_COMMIT_MESSAGE" value="-set token after registration." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1281,8 +1286,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+        <state relative-caret-position="712">
+          <caret line="144" column="96" lean-forward="true" selection-start-line="144" selection-start-column="96" selection-end-line="144" selection-end-column="96" />
           <folding />
         </state>
       </provider>
