@@ -95,20 +95,29 @@ apiRoutes.get('/test', function (req, res) {
 
 // create a new user account (POST http://localhost:8080/api/signup)
 apiRoutes.post('/signup', function (req, res) {
-    if (!req.body.data.name || !req.body.data.passwords.password) {
+
+    if (!req.body['email'] || !req.body['passwords']) {
         res.json({success: false, msg: 'Please enter name and password.'});
     } else {
         var newUser = new User({
-            profilename: req.body.data.name,
-            name: req.body.data.email,
-            password: req.body.data.passwords.password
+            profilename: req.body['name'],
+            email: req.body['email'],
+            password: req.body['passwords']['password']
         });
         // save the user
         newUser.save(function (err) {
-            if (err) {
-                return res.json({success: false, msg: 'Username already exists.'});
+            if (!err) {
+                User.findOne({
+                    email: req.body['email']
+                }, function (err, user) {
+                    var token = jwt.encode(user._id, config.secret);
+                    var name = user.name;
+                    // return the information including token as JSON
+                    res.status(200).json({ success: true, token: token, profilename: user.profilename });
+                })
+            } else{
+                res.status(403).json({success: false, msg: 'Unable to create new user.'});
             }
-            res.json({success: true, msg: 'Successful created new user.'});
         });
     }
 });
