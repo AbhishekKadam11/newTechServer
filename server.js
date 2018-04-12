@@ -111,12 +111,19 @@ apiRoutes.post('/signup', function (req, res) {
                     email: req.body['email']
                 }, function (err, user) {
                     var token = jwt.encode(user._id, config.secret);
-                    var name = user.name;
+                    var name = user.profilename;
                     // return the information including token as JSON
                     res.status(200).json({ success: true, token: token, profilename: user.profilename });
                 })
             } else{
-                res.status(403).json({success: false, msg: 'Unable to create new user.'});
+             //   if (err.code === 11000) {
+                    // email or username could violate the unique index. we need to find out which field it was.
+                    // var field = err.message.split(".$")[1];
+                    // field = field.split(" dup key")[0];
+                    // field = field.substring(0, field.lastIndexOf("_"));
+              //      res.status(403).json({success: false, msg: err.message});
+             //   }
+                res.status(403).json({success: false, msg: 'Unable to create new user.', error: err});
             }
         });
     }
@@ -125,7 +132,7 @@ apiRoutes.post('/signup', function (req, res) {
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
 apiRoutes.post('/authenticate', function (req, res) {
     User.findOne({
-        name: req.body.name
+        email: req.body.email
     }, function (err, user) {
         if (err) throw err;
 
@@ -137,7 +144,7 @@ apiRoutes.post('/authenticate', function (req, res) {
                 if (isMatch && !err) {
                     // if user is found and password is right create a token
                     var token = jwt.encode(user._id, config.secret);
-                    var name = user.name;
+                    var profilename = user.profilename;
                     // return the information including token as JSON
                     res.send({ success: true, token: token, profilename: user.profilename });
                     //     res.json({Name:user.name})
@@ -847,7 +854,8 @@ apiRoutes.get('/productReview', function (req, res) {
             data.map(obj => {
                 userbasicData(obj['customerId'])
                     .then(function (userData) {
-                        obj['name'] = userData['firstname'] + ' ' + userData['lastname'];
+                        obj['name'] = userData['profilename'];
+                        if(obj['__v'])
                         delete obj['__v'];
                         customerReview.push(obj);
                         if (customerReview.length === data.length) {
