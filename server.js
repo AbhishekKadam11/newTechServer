@@ -349,7 +349,7 @@ apiRoutes.post('/profiledata', ensureAuthorized, function (req, res) {
     function updateUser(newPass) {
         var profileData = {};
         if (req.body.username) {
-            profileData['name'] = req.body.username;
+            profileData['email'] = req.body.email;
         }
         if (newPass) {
             profileData['password'] = newPass;
@@ -395,34 +395,43 @@ apiRoutes.post('/profiledata', ensureAuthorized, function (req, res) {
 });
 
 apiRoutes.get('/userBasicDetails', ensureAuthorized, function (req, res) {
-    // var user_id = new ObjectId(req.userid);
-    // var userdata = {};
-    // db.collection('users').findOne({_id: user_id}, function (err, result) {
-    //   if (!err) {
-    //     setuserObjects(result)
-    //       .then(function (success) {
-    //         imageFound(result.imageId)
-    //           .then(function (success) {
-    //             return res.json({userData: userdata});
-    //           }, function (err) {
-    //             return res.json({userData: userdata});   //without image
-    //           })
-    //          // getplace(result.placeId)
-    //          //   .then(function (success) {
-    //          //     return res.json({userData: userdata});
-    //          //   })
-    //       })
-    //   } else {
-    //     return console.log(err);
-    //   }
-    userbasicData(req.userid)
-        .then(function (success) {
-            return res.json(success);
-        }, function (err) {
-            return res.json(err);   //without image
-        })
-});
+    var user_id = new ObjectId(req.userid);
+    var userdata = {};
+    let profileData = {};
 
+    async.parallel({
+        userDetails: function (callback) {
+            db.collection('users').find({ _id: user_id }).limit(1).next(function (err, result) {
+                if (result) {
+                    setuserObjects(result)
+                        .then(function (data) {
+                            callback(null, data);
+                        })
+                    }
+                    if(err) {
+                        res.send('Unable to fetch data');
+                    }
+                })
+        },
+        // brand: function (callback) {
+        //     db.collection('brands').find({}).toArray().then(function (brnd) {
+        //         data['brand'] = brnd.map(item => ({
+        //             text: item.name,
+        //             id: item._id
+        //         })
+        //         );
+        //         callback(null, data['brand']);
+        //         //    res.send(data);
+        //     }, function (error) {
+        //         console.log(error)
+        //     })
+        // }
+    }, function (err, results) {
+       return res.send(results);
+    });
+
+});
+// });
 
 
 
@@ -465,6 +474,8 @@ var imageFound = function (imageid) {
 var setuserObjects = function (data) {
     let userdata = {};
     return new Promise(function (resolve, reject) {
+        userdata['email'] = data.email;
+        userdata['profilename'] = data.profilename;
         userdata['firstname'] = data.firstName;
         userdata['middlename'] = data.middleName;
         userdata['lastname'] = data.lastName;
@@ -472,8 +483,8 @@ var setuserObjects = function (data) {
         userdata['gender'] = data.gender;
         userdata['mobile'] = data.mobileNo;
         userdata['address'] = data.address;
-        userdata['upcomingsale'] = data.extraaddon.upcomingsale;
-        userdata['newarrival'] = data.extraaddon.newarrival;
+        userdata['upcomingsale'] = data.extraaddon ? data.extraaddon.upcomingsale : false;
+        userdata['newarrival'] = data.extraaddon ? data.extraaddon.newarrival : false;
         userdata['selectedState'] = data.state_id;
         userdata['selectedCity'] = data.city_id;
         resolve(userdata);
@@ -487,9 +498,9 @@ let userbasicData = function (userid) {
         db.collection('users').find({ _id: user_id }).limit(1).next(function (err, result) {
             if (result) {
                 setuserObjects(result)
-                    .then(function (success) {
+                    .then(function (data) {
                         // console.log(success);
-                        resolve(success);
+                        resolve (data);
                         //  imageFound(result.imageId)
                         //      .then(function (success) {
                         //          return {userData: success};
@@ -501,7 +512,7 @@ let userbasicData = function (userid) {
                         //     return res.json({userData: userdata});
                         //   })
                     })
-            } else {
+            } if (err) {
                 return null;
             }
         })
@@ -852,18 +863,14 @@ apiRoutes.get('/productReview', function (req, res) {
        if(data.length > 0){
         var productData = asyncawait(function () {
             data.map(obj => {
-                userbasicData(obj['customerId'])
-                    .then(function (userData) {
-                        obj['name'] = userData['profilename'];
-                        if(obj['__v'])
+                let userDetails = await(userbasicData(obj['customerId']));
+                        obj['name'] = userDetails['profilename'];
+                        if(obj.hasOwnProperty('__v'))
                         delete obj['__v'];
                         customerReview.push(obj);
                         if (customerReview.length === data.length) {
                             res.status(200).json(customerReview);
                         }
-                    }, function (error) {
-                        // res.status(404).json('Unable to fetch data');
-                    });
             })
         })
         productData();
@@ -871,5 +878,4 @@ apiRoutes.get('/productReview', function (req, res) {
     }, function (error) {
         res.status(404).json('Unable to fetch data');
     });
-
 });
