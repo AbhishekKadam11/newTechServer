@@ -241,10 +241,12 @@ apiRoutes.post('/upload', function (req, res) {
     form.uploadDir = __dirname + '/uploads';
     form.keepExtensions = true;
     form.parse(req, function (err, fields, files) {
+      
         if (!err) {
             console.log('Files Uploaded');
             grid.mongo = mongoose.mongo;
             var gfs = grid(db.db);
+           
             if (files['image']) {
                 imagedata = files['image'];
                 var writestream = gfs.createWriteStream({
@@ -253,6 +255,24 @@ apiRoutes.post('/upload', function (req, res) {
                 var filename = imagedata['path'].substr(44);
                 //  imagedata['path'] =  __dirname+ "/uploads/" + filename;
                 //  console.log(imagedata['path']);
+                var result = fs.createReadStream(imagedata['path']).pipe(writestream);
+
+                writestream.on('close', function (file) {
+                    //   var pid = (file._id.toString());
+                    //   console.log(pid);
+                    res.send(filename);
+                });
+            }
+          
+            if (files['file']) {
+                imagedata = files['file'];
+                var writestream = gfs.createWriteStream({
+                    filename: imagedata['name']
+                });
+            //  console.log(filename);
+                var filename = imagedata['path'].substr(44);
+                //  imagedata['path'] =  __dirname+ "/uploads/" + filename;
+                   console.log(imagedata['path']);
                 var result = fs.createReadStream(imagedata['path']).pipe(writestream);
 
                 writestream.on('close', function (file) {
@@ -354,8 +374,8 @@ apiRoutes.post('/profiledata', ensureAuthorized, function (req, res) {
         if (newPass) {
             profileData['password'] = newPass;
         }
-        if (req.body.imageid) {
-            profileData['imageId'] = req.body.imageid;
+        if (req.body.profilePic) {
+            profileData['profilePic'] = req.body.profilePic;
         }
         if (req.body.firstname) {
             profileData['firstName'] = req.body.firstname;
@@ -475,6 +495,7 @@ var setuserObjects = function (data) {
     let userdata = {};
     return new Promise(function (resolve, reject) {
         userdata['email'] = data.email;
+        userdata['profilePic'] = data.profilePic;
         userdata['profilename'] = data.profilename;
         userdata['firstname'] = data.firstName;
         userdata['middlename'] = data.middleName;

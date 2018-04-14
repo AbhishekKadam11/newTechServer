@@ -20,8 +20,8 @@ var UserSchema = new Schema({
   profilename: {
         type: String
     },
-  imageId: {
-    type: Object
+  profilePic: {
+    type: String
   },
   firstName: {
     type: String
