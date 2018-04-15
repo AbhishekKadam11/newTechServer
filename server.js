@@ -145,8 +145,9 @@ apiRoutes.post('/authenticate', function (req, res) {
                     // if user is found and password is right create a token
                     var token = jwt.encode(user._id, config.secret);
                     var profilename = user.profilename;
+                    var profilePic = user.profilePic;
                     // return the information including token as JSON
-                    res.send({ success: true, token: token, profilename: user.profilename });
+                    res.send({ success: true, token: token, profilename: profilename, profilePic: profilePic });
                     //     res.json({Name:user.name})
                 } else {
                     res.send({ success: false, msg: 'Authentication failed. Wrong password.' });
@@ -886,6 +887,7 @@ apiRoutes.get('/productReview', function (req, res) {
             data.map(obj => {
                 let userDetails = await(userbasicData(obj['customerId']));
                         obj['name'] = userDetails['profilename'];
+                        obj['profilePic'] = userDetails['profilePic'];
                         if(obj.hasOwnProperty('__v'))
                         delete obj['__v'];
                         customerReview.push(obj);
