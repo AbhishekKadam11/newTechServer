@@ -18,6 +18,7 @@ var await = require('asyncawait/await');
 var asyncawait = require('asyncawait/async');
 var shortid = require('shortid');
 var base64Img = require('base64-img');
+var nodemailer = require('nodemailer');
 
 var config = require('./config/database'); // get db config file
 var User = require('./app/models/user'); // get the mongoose model
@@ -93,6 +94,16 @@ apiRoutes.get('/test', function (req, res) {
     res.send("testing live server");
 });
 
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'newtech.superuser@gmail.com',
+      pass: 'newtech@11'
+    }
+  });
+  
+
+
 // create a new user account (POST http://localhost:8080/api/signup)
 apiRoutes.post('/signup', function (req, res) {
 
@@ -112,22 +123,35 @@ apiRoutes.post('/signup', function (req, res) {
                 }, function (err, user) {
                     var token = jwt.encode(user._id, config.secret);
                     var name = user.profilename;
+                    sendMail(req.body['email']);
                     // return the information including token as JSON
                     res.status(200).json({ success: true, token: token, profilename: user.profilename });
                 })
             } else{
-             //   if (err.code === 11000) {
-                    // email or username could violate the unique index. we need to find out which field it was.
-                    // var field = err.message.split(".$")[1];
-                    // field = field.split(" dup key")[0];
-                    // field = field.substring(0, field.lastIndexOf("_"));
-              //      res.status(403).json({success: false, msg: err.message});
-             //   }
                 res.status(403).json({success: false, msg: 'Unable to create new user.', error: err});
             }
         });
     }
 });
+
+let sendMail = function(emailId, name) {
+    var mailOptions = {
+        from: 'newtech.superuser@gmail.com',
+        to: emailId,
+        bcc:'abhishek.kadam007@gmail.com',
+        subject: 'Welcome to newTech',
+        html: '<b>Dear '+ name +',</b> <br><br><p>Thank you for registering newTech! We have received your registration. please log in at https://newtech2.herokuapp.com </p><br> Thank you!<br>'
+
+      };
+      
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+}
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
 apiRoutes.post('/authenticate', function (req, res) {

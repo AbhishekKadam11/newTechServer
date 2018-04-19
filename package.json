@@ -12,7 +12,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "asyncawait": "^1.0.6",
-    "base64-img": "^1.0.3",
+    "base64-img": "^1.0.4",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "express": "^4.15.5",
@@ -25,6 +25,7 @@
     "morgan": "^1.9.0",
     "multer": "^1.3.0",
     "node-base64-image": "^1.0.4",
+    "nodemailer": "^4.6.4",
     "nodemon": "^1.12.1",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.0",
