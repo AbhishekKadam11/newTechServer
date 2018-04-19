@@ -123,7 +123,7 @@ apiRoutes.post('/signup', function (req, res) {
                 }, function (err, user) {
                     var token = jwt.encode(user._id, config.secret);
                     var name = user.profilename;
-                    sendMail(req.body['email']);
+                    sendMail(req.body['email'], req.body['name']);
                     // return the information including token as JSON
                     res.status(200).json({ success: true, token: token, profilename: user.profilename });
                 })
