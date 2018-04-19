@@ -136,7 +136,7 @@ apiRoutes.post('/signup', function (req, res) {
 
 let sendMail = function(emailId, name) {
     var mailOptions = {
-        from: 'newtech.superuser@gmail.com',
+        from: '"newTech"<newtech.superuser@gmail.com>',
         to: emailId,
         bcc:'abhishek.kadam007@gmail.com',
         subject: 'Welcome to newTech',
